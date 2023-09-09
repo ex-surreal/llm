@@ -1,5 +1,5 @@
 import torch
-from bigram.encoder import WordEncoder
+from bigram.encoder import TokenEncoder
 from bigram.tokenizer import tokenize
 
 
@@ -11,7 +11,7 @@ class DataHandler:
     def __init__(self, file_name: str, device, dest: str, block_size: int = 64, batch_size: int = 4, fr: float = 0.8) -> None:
         with open(file_name, "r", encoding="utf-8") as f:
             tokens = tokenize(f.read())
-            self.encoder = WordEncoder.of_tokens(tokens)
+            self.encoder = TokenEncoder.of_tokens(tokens)
             self.encoder.save(dest)
             self.data = torch.tensor(self.encoder.encode(tokens), dtype=torch.long)
         self.block_size = block_size

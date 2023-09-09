@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 from bigram.data import DataHandler
 
-from bigram.encoder import WordEncoder
+from bigram.encoder import TokenEncoder
 from bigram.tokenizer import tokenize
 
 class BigramLM(nn.Module):
@@ -59,7 +59,7 @@ def train(train_src: str, dest: str, max_iter: int, checkpoint: int):
 
 def talk(src: str):
     device = torch.device('mps' if torch.backends.mps.is_available() else 'cpu')
-    encoder = WordEncoder.load(f"{src}/encoder.json")
+    encoder = TokenEncoder.load(f"{src}/encoder.json")
     model = BigramLM(encoder.size)
     model.load_state_dict(torch.load(f"{src}/model"))
     model.to(device)

@@ -1,7 +1,7 @@
 import json
 
 
-class WordEncoder:
+class TokenEncoder:
     size: int
     word_to_id: dict
     id_to_word: list
@@ -15,9 +15,8 @@ class WordEncoder:
     def encode(self, tokens: list) -> list:
         return [self.word_to_id.get(x, self.size) for x in tokens]
 
-    def decode(self, l: list) -> list:
-        print("decode", l)
-        return [self.id_to_word[x] if x < len(self.id_to_word) else "$$$$" for x in l]
+    def decode(self, ids: list) -> list:
+        return [self.id_to_word[x] if x < len(self.id_to_word) else "$$$$" for x in ids]
 
     def save(self, dest: str):
         with open(dest, "w") as f:
