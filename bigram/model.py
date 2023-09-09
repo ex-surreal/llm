@@ -1,3 +1,4 @@
+import os
 from os import makedirs
 import sys
 import random
@@ -35,7 +36,7 @@ class BigramLM(nn.Module):
             index = torch.cat((index, index_next), dim=1)
         return index
 
-def train(train_src: str, dest: str, max_iter: int):
+def train(train_src: str, dest: str, max_iter: int, checkpoint: int):
     makedirs(dest, exist_ok=True)
     device = torch.device('mps' if torch.backends.mps.is_available() else 'cpu')
     handler = DataHandler(train_src, device, f"{dest}/encoder.json")
@@ -48,8 +49,12 @@ def train(train_src: str, dest: str, max_iter: int):
         optimizer.zero_grad(set_to_none=True)
         loss.backward()
         optimizer.step()
-        if i % 100 == 0:
+        if (i+1) % checkpoint == 0:
             print(f"Iteration {i} complete {loss.item()}")
+            if os.path.isfile(f"{dest}/checkpoint"):
+                print("Checkpointing ...")
+                torch.save(model.state_dict(), f"{dest}/model")
+                os.remove(f"{dest}/checkpoint")
     torch.save(model.state_dict(), f"{dest}/model")
 
 def talk(src: str):
