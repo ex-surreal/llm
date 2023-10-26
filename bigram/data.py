@@ -12,18 +12,22 @@ class DataHandler:
     param: HyperParam
 
     def __init__(self, root: str, dest: str, param: HyperParam) -> None:
-        print("Initialising DataHandler")
         self.root = root
         self.param = param
-        self.encoder = TokenEncoder.of_files(root)
-        self.encoder.save(path.join(dest, "encoder.json"))
+        encoder_src = path.join(dest, "encoder.json")
+        if path.isfile(encoder_src):
+            print(f"Loading encoder from {encoder_src}")
+            self.encoder = TokenEncoder.load(encoder_src)
+        else:
+            print(f"Creating encoder from {root} will be saved to {encoder_src}")
+            self.encoder = TokenEncoder.of_files(root)
+            self.encoder.save(encoder_src)
 
     def __enter__(self):
         self.train = open(path.join(self.root, "train.txt"), 'rb')
         self.train_mm = mmap.mmap(self.train.fileno(), 0, access=mmap.ACCESS_READ)
         self.eval = open(path.join(self.root, "eval.txt"), 'rb')
         self.eval_mm = mmap.mmap(self.eval.fileno(), 0, access=mmap.ACCESS_READ)
-        print("enter DataHandler")
         return self
 
     def __exit__(self, *_):
@@ -31,7 +35,6 @@ class DataHandler:
         self.train.close()
         self.eval_mm.close()
         self.eval.close()
-        print("exit DataHandler")
         return self
 
     def get_batch(self, name: str):
